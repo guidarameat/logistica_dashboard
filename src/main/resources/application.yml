@@ -1,0 +1,35 @@
+server:
+  port: 8090  # 8080 e 8081 estão em uso pelo Docker Desktop/WSL nesta máquina
+
+spring:
+  application:
+    name: guidara-expedicao-dashboard
+  config:
+    # Lê o arquivo .env da pasta do projeto (se existir) como chave=valor.
+    import: optional:file:.env[.properties]
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+
+logging:
+  level:
+    # Planilhas com PROCV para outra pasta de trabalho geram 1 log INFO por célula ("Continuing with cached value").
+    org.apache.poi.ss.formula.WorkbookEvaluator: WARN
+
+guidara:
+  importacao:
+    # Tolerância para considerar uma célula "amarela" (HSB). Ajuste se o tom de amarelo da planilha variar.
+    amarelo:
+      hue-min: 35      # graus
+      hue-max: 65      # graus
+      saturacao-min: 0.15  # 0.15 aceita amarelo bem claro (FFF2CC); suba se cinzas/beges forem confundidos
+      brilho-min: 0.70
+    # Fração mínima das células preenchidas da linha que precisam estar amarelas
+    # para a linha inteira ser considerada "não enviada".
+    fracao-linha-amarela: 0.5
+  visao:
+    # Leitura de imagens pela OpenAI. A chave vem de OPENAI_API_KEY (arquivo .env).
+    habilitada: true
+    modelo: gpt-4o   # qualquer modelo da OpenAI com visão e saída estruturada
+    max-tokens: 16000
