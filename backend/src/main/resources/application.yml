@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8090}  # 8080 e 8081 estão em uso pelo Docker Desktop/WSL nesta máquina
+  port: ${PORT:${SERVER_PORT:8090}}  # 8080 e 8081 estão em uso pelo Docker Desktop/WSL nesta máquina
 
 spring:
   application:
