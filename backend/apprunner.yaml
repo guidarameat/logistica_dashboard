@@ -1,0 +1,12 @@
+version: 1.0
+runtime: corretto17
+build:
+  commands:
+    build:
+      - mvn -B clean package -DskipTests
+run:
+  command: java -jar target/expedicao-dashboard-0.1.0-SNAPSHOT.jar
+  network:
+    port: 8090
+  # FRONTEND_URL e OPENAI_API_KEY são definidas no console do App Runner
+  # (Configuration > Environment variables; use "Secret" para a chave da OpenAI).

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guidara | Dashboard Executivo</title>
+<link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+<main>
+  <header class="top">
+    <h1>GUIDARA &nbsp;|&nbsp; DASHBOARD EXECUTIVO – EXPEDIÇÃO</h1>
+    <form class="upload" id="form">
+      <input type="file" id="arquivos" name="arquivos" multiple accept=".xlsx,.xls,.png,.jpg,.jpeg,.webp">
+      <button id="btn" type="submit">Importar</button>
+    </form>
+  </header>
+  <div class="sub" id="sub">Importe a planilha Excel ou as imagens do Relatório Roteiro Entrega.</div>
+  <div class="msg" id="msg"></div>
+
+  <div id="conteudo"><div class="empty">Nenhum dado importado ainda.</div></div>
+</main>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

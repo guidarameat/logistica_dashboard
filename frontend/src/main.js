@@ -1,92 +1,5 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Guidara | Dashboard Executivo</title>
-<style>
-  :root {
-    --bg: #111a2b; --panel: #1b2a44; --tile: #22324f; --line: #2c3e5f;
-    --text: #e8eef8; --muted: #9fb0c8; --accent: #38bdf8;
-    --ok: #17604f; --bad: #a3343f; --neutral: #34465f;
-    --warn-bg: #fde68a; --warn-text: #3b2f00; --pink: #f4a3ad;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text);
-         font: 14px/1.4 "Segoe UI", Arial, sans-serif; }
-  main { max-width: 1200px; margin: 0 auto; padding: 16px; }
-  header.top { background: var(--panel); padding: 14px 16px; display: flex; flex-wrap: wrap;
-               gap: 12px; align-items: center; justify-content: space-between; }
-  header.top h1 { margin: 0; font-size: 20px; letter-spacing: .3px; }
-  .sub { color: var(--muted); font-size: 12px; margin: 6px 0 14px; }
-  form.upload { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  form.upload input[type=file] { color: var(--muted); max-width: 100%; }
-  button { background: var(--accent); color: #04223a; border: 0; padding: 8px 14px; font-weight: 600;
-           border-radius: 4px; cursor: pointer; }
-  button:disabled { opacity: .5; cursor: wait; }
-  /* Flex em vez de grid: a última linha estica e não sobra buraco. --cols vem do JS para equilibrar (7 cartões = 4 + 3). */
-  .row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; --cols: 5; }
-  .row > .tile { flex: 1 1 max(210px, calc((100% - (var(--cols) - 1) * 10px) / var(--cols))); }
-  .tile { background: var(--tile); padding: 10px 14px 12px; min-width: 0; container-type: inline-size;
-          border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 6px; }
-  /* Valores longos (ex.: R$ 1.084.138,69) diminuem com a largura do cartão em vez de virar "..." */
-  .tile .val.long { font-size: clamp(15px, 12cqi, 26px); }
-  .tile .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
-  .tile .val { font-size: clamp(18px, 2vw, 26px); font-weight: 700; text-align: right;
-               font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .tile .val.pink { color: var(--pink); }
-  .tile .val.yellow { color: var(--warn-bg); }
-  .section { background: var(--panel); padding: 6px 10px; font-weight: 700; text-transform: uppercase;
-             font-size: 13px; margin: 18px 0 10px; }
-  .section.alert { background: var(--bad); }
-  .status { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-  .status div { text-align: center; padding: 10px; font-weight: 700; font-size: 16px; text-transform: uppercase; }
-  .ok { background: var(--ok); } .bad { background: var(--bad); } .neutral { background: var(--neutral); }
-  .bar { display: grid; grid-template-columns: 180px 70px 1fr; gap: 8px; align-items: center; margin: 4px 0; font-size: 13px; }
-  .bar b { text-align: right; font-variant-numeric: tabular-nums; }
-  .bar .track { height: 14px; background: transparent; }
-  .bar .fill { height: 100%; background: var(--accent); }
-  .bar .fill.pink { background: #f2667a; }
-  .bar .fill.yellow { background: #facc15; }
-  ul.alerts { margin: 0; padding: 8px 10px 8px 28px; background: var(--tile); }
-  ul.alerts li { margin: 3px 0; }
-  .tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
-  .tabs button { background: var(--tile); color: var(--text); font-weight: 500; }
-  .tabs button.on { background: var(--accent); color: #04223a; font-weight: 700; }
-  .table-wrap { overflow-x: auto; background: var(--tile); }
-  table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
-  th, td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
-  th { background: var(--panel); color: var(--muted); font-weight: 600; position: sticky; top: 0; }
-  td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  tr.amarelo td { background: var(--warn-bg); color: var(--warn-text); }
-  .pill { padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
-  .pill.FATURADO { background: var(--ok); }
-  .pill.PENDENTE_FATURAMENTO { background: var(--bad); }
-  .pill.NAO_ENVIADO { background: #a16207; color: #fff; }
-  .pill.EM_DOCA { background: var(--bad); } .pill.FORA_DA_DOCA { background: var(--ok); }
-  .placa { font-family: Consolas, monospace; font-weight: 700; letter-spacing: .5px; }
-  .empty { padding: 40px; text-align: center; color: var(--muted); background: var(--tile); }
-  .msg { color: var(--pink); font-size: 13px; }
-  .avisos { color: var(--muted); font-size: 12px; }
-  @media (max-width: 600px) { .bar { grid-template-columns: 1fr 60px; } .bar .track { grid-column: 1 / -1; } }
-</style>
-</head>
-<body>
-<main>
-  <header class="top">
-    <h1>GUIDARA &nbsp;|&nbsp; DASHBOARD EXECUTIVO – EXPEDIÇÃO</h1>
-    <form class="upload" id="form">
-      <input type="file" id="arquivos" name="arquivos" multiple accept=".xlsx,.xls,.png,.jpg,.jpeg,.webp">
-      <button id="btn" type="submit">Importar</button>
-    </form>
-  </header>
-  <div class="sub" id="sub">Importe a planilha Excel ou as imagens do Relatório Roteiro Entrega.</div>
-  <div class="msg" id="msg"></div>
+import { apiUrl } from './config.js';
 
-  <div id="conteudo"><div class="empty">Nenhum dado importado ainda.</div></div>
-</main>
-
-<script>
 const brl = v => v == null ? '—' : 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const num = (v, d = 2) => v == null ? '' : Number(v).toLocaleString('pt-BR', {minimumFractionDigits: d, maximumFractionDigits: d});
 const pct = v => v == null ? '—' : num(v) + '%';
@@ -95,7 +8,7 @@ const dataBR = d => d ? d.split('-').reverse().join('/') : '';
 let dados = null, aba = 'naoEnviados';
 
 async function carregar() {
-  const r = await fetch('/api/dashboard');
+  const r = await fetch(apiUrl('/api/dashboard'));
   if (r.status === 404) return;
   if (!r.ok) { document.getElementById('msg').textContent = (await r.json()).detail; return; }
   dados = await r.json();
@@ -111,7 +24,7 @@ document.getElementById('form').addEventListener('submit', async e => {
   const btn = document.getElementById('btn'), msg = document.getElementById('msg');
   btn.disabled = true; msg.textContent = 'Processando...';
   try {
-    const r = await fetch('/api/importacoes', {method: 'POST', body: fd});
+    const r = await fetch(apiUrl('/api/importacoes'), {method: 'POST', body: fd});
     const body = await r.json();
     if (!r.ok) { msg.textContent = body.detail || 'Falha na importação.'; return; }
     msg.textContent = '';
@@ -186,7 +99,7 @@ async function renderTabela() {
   document.querySelectorAll('[data-aba]').forEach(b => b.classList.toggle('on', b.dataset.aba === aba));
   let lista = aba === 'naoEnviados' ? dados.pedidosNaoEnviados
             : aba === 'pendentes' ? dados.pedidosPendentesFaturamento
-            : await (await fetch('/api/pedidos')).json();
+            : await (await fetch(apiUrl('/api/pedidos'))).json();
   const temValor = lista.some(x => x.valor != null);
   document.getElementById('tabela').innerHTML = lista.length ? `<table>
     <tr><th>OC</th><th>Placa</th><th>Pedido</th><th>Nota</th><th>Cliente</th><th>CEP</th><th>Endereço</th><th>Nr</th><th>Bairro</th><th>Cidade</th><th class="num">Peso Líq.</th><th class="num">Volumes</th>${temValor ? '<th class="num">Valor</th>' : ''}<th>Status</th><th>Observações</th></tr>
@@ -198,12 +111,9 @@ async function renderTabela() {
 }
 
 async function alterarDoca(oc, status) {
-  const r = await fetch(`/api/cargas/${encodeURIComponent(oc)}/status-doca`, {
+  const r = await fetch(apiUrl(`/api/cargas/${encodeURIComponent(oc)}/status-doca`), {
     method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({status})});
   if (r.ok) carregar(); else document.getElementById('msg').textContent = (await r.json()).detail;
 }
 
 carregar();
-</script>
-</body>
-</html>
